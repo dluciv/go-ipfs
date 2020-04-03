@@ -117,10 +117,11 @@ func patchCORSVars(c *cmdsHttp.ServerConfig, addr net.Addr) {
 	c.SetAllowedOrigins(newOrigins...)
 }
 
-func commandsOption(cctx oldcmds.Context, command *cmds.Command) ServeOption {
+func commandsOption(cctx oldcmds.Context, command *cmds.Command, handledMethods []string) ServeOption {
 	return func(n *core.IpfsNode, l net.Listener, mux *http.ServeMux) (*http.ServeMux, error) {
 
 		cfg := cmdsHttp.NewServerConfig()
+		cfg.HandledMethods = handledMethods
 		cfg.SetAllowedMethods(http.MethodGet, http.MethodPost, http.MethodPut)
 		cfg.APIPath = APIPath
 		rcfg, err := n.Repo.Config()
@@ -140,15 +141,15 @@ func commandsOption(cctx oldcmds.Context, command *cmds.Command) ServeOption {
 }
 
 // CommandsOption constructs a ServerOption for hooking the commands into the
-// HTTP server.
+// HTTP server. These can be called only with POST, "OPTIONS" and "HEAD".
 func CommandsOption(cctx oldcmds.Context) ServeOption {
-	return commandsOption(cctx, corecommands.Root)
+	return commandsOption(cctx, corecommands.Root, []string{"POST", "OPTIONS", "HEAD"})
 }
 
 // CommandsROOption constructs a ServerOption for hooking the read-only commands
-// into the HTTP server.
+// into the HTTP server. These can be called with GET or POST.
 func CommandsROOption(cctx oldcmds.Context) ServeOption {
-	return commandsOption(cctx, corecommands.RootRO)
+	return commandsOption(cctx, corecommands.RootRO, []string{"GET", "POST", "OPTIONS", "HEAD"})
 }
 
 // CheckVersionOption returns a ServeOption that checks whether the client ipfs version matches. Does nothing when the user agent string does not contain `/go-ipfs/`
