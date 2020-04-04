@@ -143,7 +143,7 @@ func commandsOption(cctx oldcmds.Context, command *cmds.Command, handledMethods 
 // CommandsOption constructs a ServerOption for hooking the commands into the
 // HTTP server. These can be called only with POST, "OPTIONS" and "HEAD".
 func CommandsOption(cctx oldcmds.Context) ServeOption {
-	return commandsOption(cctx, corecommands.Root, []string{"POST", "OPTIONS", "HEAD"})
+	return commandsOption(cctx, corecommands.Root, []string{"POST", "OPTIONS"})
 }
 
 // CommandsROOption constructs a ServerOption for hooking the read-only commands
